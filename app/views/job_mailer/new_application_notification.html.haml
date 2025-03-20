@@ -1,0 +1,27 @@
+%h1= t('job_mailers.new_application.heading')
+%p= t('job_mailers.new_application.greeting', recipient: display_name(@employer))
+%p= t('job_mailers.new_application.intro', 
+  job_title: content_tag(:strong, @job.title),
+  applicant_name: content_tag(:strong, @application.applicant_fullname)).html_safe
+.info-box
+  %h3= t('job_mailers.new_application.applicant_details')
+  %p
+    %strong= t('job_mailers.new_application.name') + ':'
+    = @application.applicant_fullname
+  %p
+    %strong= t('job_mailers.new_application.email') + ':'
+    = mail_to @application.applicant_email
+  %p
+    %strong= t('job_mailers.new_application.phone') + ':'
+    = @application.applicant_phone_number
+  %p
+    %strong= t('job_mailers.new_application.applied_at') + ':'
+    = l(@application.created_at, format: :long)
+- if @application.cover_letter.present?
+  %div
+    %h3= t('job_mailers.new_application.cover_letter')
+    .text-box
+      = simple_format(@application.cover_letter)
+%p= t('job_mailers.new_application.resume_attached')
+%div
+  %p= t('job_mailers.new_application.review_prompt')

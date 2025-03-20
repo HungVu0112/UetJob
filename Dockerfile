@@ -375,6 +375,7 @@ RUN \
   libvpx7 \
   libx264-164 \
   libx265-199 \
+  nano \
   ;
 
 # Copy Mastodon sources into final layer

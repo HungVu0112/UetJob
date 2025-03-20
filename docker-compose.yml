@@ -1,5 +1,5 @@
 # This file is designed for production server deployment, not local development work
-# For a containerized local dev environment, see: https://github.com/mastodon/mastodon/blob/main/docs/DEVELOPMENT.md#docker
+# For a containerized local dev environment, see: https://github.com/mastodon/mastodon/blob/main/README.md#docker
 
 services:
   db:
@@ -13,6 +13,9 @@ services:
     volumes:
       - ./postgres14:/var/lib/postgresql/data
     environment:
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=abc123'
+      - 'POSTGRES_DB=mastodon_production'
       - 'POSTGRES_HOST_AUTH_METHOD=trust'
 
   redis:
@@ -58,32 +61,44 @@ services:
 
   web:
     # You can uncomment the following line if you want to not use the prebuilt image, for example if you have local code changes
-    # build: .
-    image: ghcr.io/mastodon/mastodon:v4.3.4
+    build: .
+    image: ghcr.io/mastodon/mastodon:v4.3.2
     restart: always
     env_file: .env.production
     command: bundle exec puma -C config/puma.rb
     networks:
       - external_network
       - internal_network
+    dns:                  
+      - 8.8.8.8
+      - 8.8.4.4
     healthcheck:
       # prettier-ignore
       test: ['CMD-SHELL',"curl -s --noproxy localhost localhost:3000/health | grep -q 'OK' || exit 1"]
     ports:
-      - '127.0.0.1:3000:3000'
+      - '80:3000'
     depends_on:
       - db
       - redis
       # - es
     volumes:
       - ./public/system:/mastodon/public/system
+      - ./public/assets:/mastodon/public/assets:rw
+      - ./config/initializers/disable_ssl.rb:/mastodon/config/initializers/disable_ssl.rb
+      - ./app/views/application/mailer/_button.html.haml:/mastodon/app/views/application/mailer/_button.html.haml
+      - ./app/models:/mastodon/app/models
+      - ./app/controllers:/mastodon/app/controllers
+      - ./app/serializers:/mastodon/app/serializers
+      - ./db/migrate:/mastodon/db/migrate
+      - ./config/initializers:/mastodon/config/initializers
+      - ./config/routes:/mastodon/config/routes
 
   streaming:
     # You can uncomment the following lines if you want to not use the prebuilt image, for example if you have local code changes
     # build:
     #   dockerfile: ./streaming/Dockerfile
     #   context: .
-    image: ghcr.io/mastodon/mastodon-streaming:v4.3.4
+    image: ghcr.io/mastodon/mastodon-streaming:v4.3.2
     restart: always
     env_file: .env.production
     command: node ./streaming/index.js
@@ -94,7 +109,7 @@ services:
       # prettier-ignore
       test: ['CMD-SHELL', "curl -s --noproxy localhost localhost:4000/api/v1/streaming/health | grep -q 'OK' || exit 1"]
     ports:
-      - '127.0.0.1:4000:4000'
+      - '81:4000'
     depends_on:
       - db
       - redis
@@ -102,10 +117,10 @@ services:
   sidekiq:
     # You can uncomment the following line if you want to not use the prebuilt image, for example if you have local code changes
     # build: .
-    image: ghcr.io/mastodon/mastodon:v4.3.4
+    image: ghcr.io/mastodon/mastodon:v4.3.2
     restart: always
     env_file: .env.production
-    command: bundle exec sidekiq
+    command: bundle exec sidekiq -q default -q push -q mailers -q pull -q ingress -q scheduler 
     depends_on:
       - db
       - redis
@@ -114,6 +129,7 @@ services:
       - internal_network
     volumes:
       - ./public/system:/mastodon/public/system
+      - ./app/views/application/mailer/_button.html.haml:/mastodon/app/views/application/mailer/_button.html.haml
     healthcheck:
       test: ['CMD-SHELL', "ps aux | grep '[s]idekiq\ 6' || false"]
 
@@ -135,6 +151,7 @@ services:
   #     - internal_network
 
 networks:
-  external_network:
+  external_network:    
+    driver: bridge
   internal_network:
     internal: true

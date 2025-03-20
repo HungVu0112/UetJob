@@ -1,0 +1,24 @@
+<%= t('job_mailers.new_application.heading') %>
+
+<%= t('job_mailers.new_application.greeting', recipient: display_name(@employer)) %>
+
+<%= t('job_mailers.new_application.intro', 
+      job_title: @job.title,
+      applicant_name: @application.applicant_fullname) %>
+
+<%= t('job_mailers.new_application.applicant_details') %>
+<%= t('job_mailers.new_application.name') %>: <%= @application.applicant_fullname %>
+<%= t('job_mailers.new_application.email') %>: <%= @application.applicant_email %>
+<%= t('job_mailers.new_application.phone') %>: <%= @application.applicant_phone_number %>
+<%= t('job_mailers.new_application.applied_at') %>: <%= l(@application.created_at, format: :long) %>
+
+<% if @application.cover_letter.present? %>
+<%= t('job_mailers.new_application.cover_letter') %>
+--------------------
+<%= @application.cover_letter %>
+--------------------
+<% end %>
+
+<%= t('job_mailers.new_application.resume_attached') %>
+
+<%= t('job_mailers.new_application.review_prompt') %>

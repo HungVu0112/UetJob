@@ -1,0 +1,22 @@
+<%= t('job_mailers.job_closed.heading') %>
+
+<%= t('job_mailers.job_closed.greeting', recipient: @user.display_name) %>
+
+<%= t('job_mailers.job_closed.intro', job_title: @job.title, company: @organization.name) %>
+
+<%= t('job_mailers.job_closed.application_details') %>
+<%= t('job_mailers.job_closed.job_title') %>: <%= @job.title %>
+<%= t('job_mailers.job_closed.company') %>: <%= @organization.name %>
+<%= t('job_mailers.job_closed.applied_on') %>: <%= l(@application.created_at, format: :long) %>
+<%= t('job_mailers.job_closed.status') %>: <%= t("job_applications.statuses.#{@application.status}") %>
+
+<%= t('job_mailers.job_closed.what_next') %>
+
+<% if @application.pending? || @application.reviewing? || @application.interviewed? %>
+- <%= t('job_mailers.job_closed.still_considering') %>
+<% elsif @application.accepted? %>
+- <%= t('job_mailers.job_closed.already_accepted') %>
+<% elsif @application.rejected? %>
+- <%= t('job_mailers.job_closed.already_rejected') %>
+<% end %>
+- <%= t('job_mailers.job_closed.other_opportunities') %>

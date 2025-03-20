@@ -1,0 +1,20 @@
+%h1= t('job_mailers.application_interview.heading')
+%p= t('job_mailers.application_interview.greeting', recipient: @user.display_name)
+%p= t('job_mailers.application_interview.intro', job_title: @job.title, company: @job.organization.name)
+
+.div{style: 'margin: 20px 0; padding: 15px; border-left: 4px solid #2b90d9; background-color: #f9f9f9;'}
+  %h3= t('job_mailers.application_interview.job_details')
+  %p
+    %strong= t('job_mailers.application_interview.job_title') + ':'
+    = @job.title
+  %p
+    %strong= t('job_mailers.application_interview.company') + ':'
+    = @job.organization.name
+  %p
+    %strong= t('job_mailers.application_interview.applied_at') + ':'
+    = l(@application.created_at, format: :long)
+  %p
+    %strong= t('job_mailers.application_interview.status') + ':'
+    = t("job_applications.statuses.#{@application.status}")
+
+%p= t('job_mailers.application_interview.next_steps')

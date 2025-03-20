@@ -13,6 +13,8 @@
   /domain_blocks
   /explore/(*any)
   /favourites
+  /jobs/(*any)
+  /organization/(*any)
   /follow_requests
   /followed_tags
   /getting-started

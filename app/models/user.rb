@@ -5,6 +5,46 @@
 # Table name: users
 #
 #  id                        :bigint(8)        not null, primary key
+#  approved                  :boolean          default(TRUE), not null
+#  chosen_languages          :string           is an Array
+#  confirmation_sent_at      :datetime
+#  confirmation_token        :string
+#  confirmed_at              :datetime
+#  consumed_timestep         :integer
+#  current_sign_in_at        :datetime
+#  disabled                  :boolean          default(FALSE), not null
+#  email                     :string           default(""), not null
+#  encrypted_otp_secret      :string
+#  encrypted_otp_secret_iv   :string
+#  encrypted_otp_secret_salt :string
+#  encrypted_password        :string           default(""), not null
+#  last_emailed_at           :datetime
+#  last_sign_in_at           :datetime
+#  locale                    :string
+#  otp_backup_codes          :string           is an Array
+#  otp_required_for_login    :boolean          default(FALSE), not null
+#  otp_secret                :string
+#  reset_password_sent_at    :datetime
+#  reset_password_token      :string
+#  saved_jobs                :string           default([]), is an Array
+#  settings                  :text
+#  sign_in_count             :integer          default(0), not null
+#  sign_in_token             :string
+#  sign_in_token_sent_at     :datetime
+#  sign_up_ip                :inet
+#  time_zone                 :string
+#  unconfirmed_email         :string
+#  user_type                 :string           default("guest")
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  account_id                :bigint(8)        not null
+#  created_by_application_id :bigint(8)
+#  invite_id                 :bigint(8)
+#  organization_id           :bigint(8)
+#  role_id                   :bigint(8)
+#  webauthn_id               :string
+#
+#  id                        :bigint(8)        not null, primary key
 #  email                     :string           default(""), not null
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
@@ -40,7 +80,8 @@
 #  settings                  :text
 #  time_zone                 :string
 #  otp_secret                :string
-#
+#  user_type                 :string           default("guest")
+#  saved_jobs                :jsonb            default([])
 
 class User < ApplicationRecord
   self.ignored_columns += %w(
@@ -68,6 +109,10 @@ class User < ApplicationRecord
   # every day. Raising the duration reduces the amount of expensive
   # RegenerationWorker jobs that need to be run when those people come
   # to check their feed
+
+  # Definition of user type
+  enum :user_type, { guest: 'guest', student: 'student', organization: 'organization' }
+
   ACTIVE_DURATION = ENV.fetch('USER_ACTIVE_DAYS', 7).to_i.days.freeze
 
   devise :two_factor_authenticatable,
@@ -86,6 +131,7 @@ class User < ApplicationRecord
   belongs_to :invite, counter_cache: :uses, optional: true
   belongs_to :created_by_application, class_name: 'Doorkeeper::Application', optional: true
   belongs_to :role, class_name: 'UserRole', optional: true
+  belongs_to :organization, optional: true
   accepts_nested_attributes_for :account
 
   has_many :applications, class_name: 'Doorkeeper::Application', as: :owner, dependent: nil
@@ -112,6 +158,7 @@ class User < ApplicationRecord
   validates :website, absence: true, on: :create
   validates :confirm_password, absence: true, on: :create
   validate :validate_role_elevation
+  validates :saved_jobs, length: { maximum: 100 }
 
   scope :account_not_suspended, -> { joins(:account).merge(Account.without_suspended) }
   scope :recent, -> { order(id: :desc) }
@@ -126,9 +173,15 @@ class User < ApplicationRecord
   scope :not_signed_in_recently, -> { where(current_sign_in_at: ...ACTIVE_DURATION.ago) }
   scope :matches_email, ->(value) { where(arel_table[:email].matches("#{value}%")) }
   scope :matches_ip, ->(value) { left_joins(:ips).merge(IpBlock.contained_by(value)).group(users: [:id]) }
+  scope :students, -> { where(user_type: 'student') }
+  scope :organizations, -> { where(user_type: 'organization') }
+  scope :guests, -> { where(user_type: 'guest') }
 
   before_validation :sanitize_role
   before_create :set_approved
+  # Check email domain when create a new account
+  before_create :set_user_type_from_email
+  after_create :auto_join_organization_by_email_domain
   after_commit :send_pending_devise_notifications
   after_create_commit :trigger_webhooks
 
@@ -142,6 +195,38 @@ class User < ApplicationRecord
 
   attr_reader :invite_code
   attr_writer :external, :bypass_invite_request_check, :current_account
+
+  def student?
+    user_type == 'student'
+  end
+
+  def organization?
+    user_type == 'organization'
+  end
+
+  def guest?
+    user_type == 'guest'
+  end
+
+  def can_post_job?
+    organization? && organization.present?
+  end
+
+  def can_seek_job?
+    student? || organization?
+  end
+
+  def can_apply_job?
+    student?
+  end
+
+  def in_organization?
+    organization.present?
+  end
+
+  def email_domain
+    email.split('@').last if email.present?
+  end
 
   def self.those_who_can(*any_of_privileges)
     matching_role_ids = UserRole.that_can(*any_of_privileges).map(&:id)
@@ -536,5 +621,28 @@ class User < ApplicationRecord
 
   def trigger_webhooks
     TriggerWebhookWorker.perform_async('account.created', 'Account', account_id)
+  end
+
+  def set_user_type_from_email
+    if email.present?
+      self.user_type = if email.end_with?('@vnu.edu.vn')
+                         'student'
+                       elsif email.end_with?('@gmail.com')
+                         'guest'
+                       else
+                         'organization'
+                       end
+    end
+  end
+
+  def auto_join_organization_by_email_domain
+    return unless organization?
+
+    domain = email_domain
+    return if domain.blank?
+
+    org = Organization.find_by(email_domain: domain)
+
+    update(organization: org) if org
   end
 end

@@ -229,3 +229,39 @@ export function ListEdit () {
 export function ListMembers () {
   return import(/* webpackChunkName: "features/lists" */'../../lists/members');
 }
+
+export function Jobs () {
+  return import(/* webpackChunkName: "features/jobs" */'../../jobs');
+}
+
+export function JobPage () {
+  return import(/* webpackChunkName: "features/jobs" */'../../job');
+}
+
+export function OpenBusiness () {
+  return import(/* webpackChunkName: "features/open_business" */'../../open_business');
+}
+
+export function Organization () {
+  return import(/* webpackChunkName: "features/organization" */'../../organization');
+}
+
+export function OrganizationEdit () {
+  return import(/* webpackChunkName: "features/organization_edit" */'../../organization_edit');
+}
+
+export function CreateJobPage () {
+  return import(/* webpackChunkName: "features/create_job" */'../../create_job');  
+}
+
+export function SavedJobs () {
+  return import(/* webpackChunkName: "features/saved_jobs" */'../../saved_jobs');
+}
+
+export function AppliedJobs () {
+  return import(/* webpackChunkName: "features/applied_jobs" */'../../applied_jobs');
+}
+
+export function CreatedJobs () {
+  return import(/* webpackChunkName: "features/created_jobs" */'../../created_jobs');
+}

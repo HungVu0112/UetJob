@@ -17,6 +17,8 @@ import filters from './filters';
 import followed_tags from './followed_tags';
 import height_cache from './height_cache';
 import history from './history';
+import job_applications from './job_applications';
+import jobs from './jobs';
 import { listsReducer } from './lists';
 import { markersReducer } from './markers';
 import media_attachments from './media_attachments';
@@ -26,6 +28,7 @@ import { notificationGroupsReducer } from './notification_groups';
 import { notificationPolicyReducer } from './notification_policy';
 import { notificationRequestsReducer } from './notification_requests';
 import notifications from './notifications';
+import organizations from './organizations';
 import { pictureInPictureReducer } from './picture_in_picture';
 import { pollsReducer } from './polls';
 import push_notifications from './push_notifications';
@@ -54,6 +57,9 @@ const reducers = {
   accounts: accountsReducer,
   accounts_map,
   statuses,
+  organizations,
+  jobs,
+  job_applications,
   relationships: relationshipsReducer,
   settings,
   push_notifications,

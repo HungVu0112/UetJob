@@ -73,10 +73,19 @@ import {
   About,
   PrivacyPolicy,
   TermsOfService,
+  Jobs,
+  JobPage,
+  OpenBusiness,
+  Organization,
+  OrganizationEdit,
+  CreateJobPage,
+  SavedJobs,
+  AppliedJobs,
+  CreatedJobs
 } from './util/async-components';
 import { ColumnsContextProvider } from './util/columns_context';
 import { WrappedSwitch, WrappedRoute } from './util/react_router_helpers';
-
+// Trong file App.js hoặc index.js
 // Dummy import, to make sure that <Status /> ends up in the application bundle.
 // Without this it ends up in ~8 very commonly used bundles.
 import '../../components/status';
@@ -224,6 +233,15 @@ class SwitchingColumnsArea extends PureComponent {
             <WrappedRoute path='/notifications/requests' component={NotificationRequests} content={children} exact />
             <WrappedRoute path='/notifications/requests/:id' component={NotificationRequest} content={children} exact />
             <WrappedRoute path='/favourites' component={FavouritedStatuses} content={children} />
+            <WrappedRoute path='/jobs/saved' component={SavedJobs} content={children} />
+            <WrappedRoute path='/jobs/applied' component={AppliedJobs} content={children} />
+            <WrappedRoute path='/jobs/created' component={CreatedJobs} content={children} />
+            <WrappedRoute path='/jobs/:id' component={JobPage} content={children} />
+            <WrappedRoute path='/jobs' component={Jobs} content={children} />
+            <WrappedRoute path='/organization/create' component={OpenBusiness} content={children} />
+            <WrappedRoute path='/organization/:id/edit' component={OrganizationEdit} content={children} />
+            <WrappedRoute path='/organization/:id/create_job' component={CreateJobPage} content={children} />
+            <WrappedRoute path='/organization/:id' component={Organization} content={children} />
 
             <WrappedRoute path='/bookmarks' component={BookmarkedStatuses} content={children} />
             <WrappedRoute path='/pinned' component={PinnedStatuses} content={children} />
@@ -430,7 +448,12 @@ class UI extends PureComponent {
     }
 
     this.hotkeys.__mousetrap__.stopCallback = (e, element) => {
-      return ['TEXTAREA', 'SELECT', 'INPUT'].includes(element.tagName);
+      const isInputElement = ['TEXTAREA', 'SELECT', 'INPUT'].includes(element.tagName);
+      const isSpecificPage = window.location.pathname.includes('/create_job');
+    
+      if (isInputElement || isSpecificPage) {
+        return true;
+      }
     };
   }
 

@@ -10,26 +10,39 @@ export interface IdentityContextType {
   accountId: string | undefined;
   disabledAccountId: string | undefined;
   permissions: number;
+  user_type: string | undefined;
+  organization_id: number | undefined;
 }
 
 export const identityContextPropShape = PropTypes.shape({
   signedIn: PropTypes.bool.isRequired,
   accountId: PropTypes.string,
   disabledAccountId: PropTypes.string,
+  user_type: PropTypes.string,
+  organization_id: PropTypes.number,
 }).isRequired;
 
-export const createIdentityContext = (state: InitialState) => ({
-  signedIn: !!state.meta.me,
-  accountId: state.meta.me,
-  disabledAccountId: state.meta.disabled_account_id,
-  permissions: state.role?.permissions ?? 0,
-});
+export const createIdentityContext = (state: InitialState) => {
+  const accountId = state.meta.me;
+  const account = accountId ? state.accounts[accountId] : undefined;
+  
+  return {
+    signedIn: !!accountId,
+    accountId,
+    disabledAccountId: state.meta.disabled_account_id,
+    permissions: state.role?.permissions ?? 0,
+    user_type: account?.user_type, // Safely access user_type
+    organization_id: account?.organization_id, // Safely access
+  };
+};
 
 export const IdentityContext = createContext<IdentityContextType>({
   signedIn: false,
   permissions: 0,
   accountId: undefined,
   disabledAccountId: undefined,
+  user_type: undefined,
+  organization_id: undefined,
 });
 
 export const useIdentity = () => useContext(IdentityContext);

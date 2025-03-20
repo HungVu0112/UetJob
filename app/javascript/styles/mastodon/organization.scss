@@ -1,0 +1,244 @@
+.organization-header {
+    border-bottom: 1px solid var(--background-border-color);
+
+    &__avatar {
+        width: 100%;
+        height: 145px;
+        position: relative;
+        background-color: var(--surface-background-color);
+
+        &__tabs {
+            position: absolute;
+            height: 92px;
+            width: 100%;
+            bottom: -46px;
+            left: 0;
+            padding-left: 20px;
+            padding-right: 20px;
+            
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+
+            box-sizing: border-box;
+        }
+
+        &__container {
+            width: 92px;
+            height: 92px;
+            border-radius: 8px;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        &__edit {
+            button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                background-color: $classic-highlight-color;
+                color: $classic-secondary-color;
+                font-weight: bold;
+            }
+
+            button:hover {
+                transform: scaleX(1.03);
+                transition: transform 0.2s ease-out;
+            }
+        }
+    }
+
+    &__info {
+        margin-top: 66px;
+        width: 100%;
+        padding: 0 20px;
+
+        box-sizing: border-box;
+
+        h1 {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        p {
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--on-input-color);  
+        }
+
+        &__date {
+            margin-top: 16px;
+            padding: 16px 20px;
+            background-color: var(--surface-background-color);
+            border: 1px solid var(--background-border-color);
+            border-radius: 5px;
+
+            h1 {
+                color: var(--input-placeholder-color);
+                font-size: 12px;
+            }
+
+            p {
+                margin-top: 0px;
+                font-size: 12px;
+            }
+        }
+
+        &__amounts {
+            margin-top: 16px;
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+
+            &__jobs, &__members {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+
+                font-size: 14px;
+                font-weight: bold;
+
+                p {
+                    margin-top: -1px;
+                    color: var(--on-input-color);  
+                }
+            }
+        }
+    }
+}
+
+.organization-content {
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid var(--background-border-color);
+
+        h1 {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        button {
+            border: none;
+            border-radius: 5px;
+            background-color: $classic-highlight-color;
+            color: $classic-secondary-color;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: scaleX(1.03);
+            transition: transform 0.2s ease-out;
+        }
+    }
+}
+
+.organization-edit {
+    border: 1px solid var(--background-border-color);
+    border-top: none;
+    border-radius: 4px;
+
+    &__heading {
+        width: 100%;
+        height: 145px;
+        position: relative;
+        background-color: var(--surface-background-color);
+    }
+
+    &__avatar_holder {
+        position: absolute;
+        width: 92px;
+        height: 92px;
+        bottom: -46px;
+        left: 20px;
+        
+        border-radius: 8px;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        > .icon {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+    }
+
+    &__form {
+        margin-top: 66px;
+        width: 100%;
+        padding: 0 20px;
+        box-sizing: border-box;
+
+        button {
+            width: 100%;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: $classic-highlight-color;
+            color: $classic-secondary-color;
+            font-weight: bold;
+            margin-top: 16px;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            transform: scaleX(1.03);
+            transition: transform 0.2s ease-out;
+        }
+    }
+
+    &__form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+
+
+        label {
+            color: $classic-highlight-color;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input {
+            height: 30px;
+            outline-color: $classic-highlight-color;
+            border: 1px solid var(--background-border-color);
+            border-radius: 5px;
+            padding: 0 8px;
+            background-color: var(--input-background-color);
+        }
+
+        textarea {
+            min-height: 60px;
+            outline-color: $classic-highlight-color;
+            border: 1px solid var(--background-border-color);
+            border-radius: 5px;
+            padding: 8px;
+            background-color: var(--input-background-color);
+            resize: vertical;
+        }
+
+        input, textarea {
+            color: var(--on-input-color);
+        }
+    }
+}
+
+.organization-container article[aria-posinset="1"] {
+    opacity: 1 !important;
+}
+

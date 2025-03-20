@@ -1,0 +1,7 @@
+<%= yield %>
+
+--------------------
+<%= t('job_mailers.footer.text', instance: @instance) %>
+<% if content_for?(:notification_preferences) %>
+<%= yield :notification_preferences %>
+<% end %>

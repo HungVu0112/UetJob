@@ -122,10 +122,6 @@ class Api::V1::AccountsController < Api::BaseController
     params.permit(:username, :email, :password, :agreement, :locale, :reason, :time_zone, :invite_code)
   end
 
-  def invite
-    Invite.find_by(code: params[:invite_code]) if params[:invite_code].present?
-  end
-
   def check_enabled_registrations
     forbidden unless allowed_registration?(request.remote_ip, invite)
   end

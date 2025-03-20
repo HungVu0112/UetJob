@@ -1,0 +1,13 @@
+<%= t('job_mailers.application_reviewing.heading') %>
+
+<%= t('job_mailers.application_reviewing.greeting', recipient: @user.display_name) %>
+
+<%= t('job_mailers.application_reviewing.intro', job_title: @job.title) %>
+
+<%= t('job_mailers.application_reviewing.job_details') %>
+<%= t('job_mailers.application_reviewing.job_title') %>: <%= @job.title %>
+<%= t('job_mailers.application_reviewing.company') %>: <%= @job.organization.name %>
+<%= t('job_mailers.application_reviewing.applied_at') %>: <%= l(@application.created_at, format: :long) %>
+<%= t('job_mailers.application_reviewing.status') %>: <%= t("job_applications.statuses.#{@application.status}") %>
+
+<%= t('job_mailers.application_reviewing.next_steps') %>

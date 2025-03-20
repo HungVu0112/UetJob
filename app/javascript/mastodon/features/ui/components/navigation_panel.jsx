@@ -7,6 +7,16 @@ import { Link } from 'react-router-dom';
 
 import { useSelector, useDispatch } from 'react-redux';
 
+import CreatedJobIcon from '@/material-icons/400-24px/created_job.svg?react';
+import CreatedJobsActiveIcon from '@/material-icons/400-24px/created_job_fill.svg?react';
+import SavedJobIcon from '@/material-icons/400-24px/save_job.svg?react';
+import SavedJobsActiveIcon from '@/material-icons/400-24px/save_job_fill.svg?react';
+import AppliedJobIcon from '@/material-icons/400-24px/applied_job.svg?react';
+import AppliedJobsActiveIcon from '@/material-icons/400-24px/applied_job_fill.svg?react';
+import OrganizationsIcon from '@/material-icons/400-24px/organizations.svg';
+import OrganizationsActiveIcon from '@/material-icons/400-24px/organizations-fill.svg';
+import JobsIcon from '@/material-icons/400-24px/jobs.svg';
+import JobsActiveIcon from '@/material-icons/400-24px/jobs-fill.svg';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import BookmarksActiveIcon from '@/material-icons/400-24px/bookmarks-fill.svg?react';
 import BookmarksIcon from '@/material-icons/400-24px/bookmarks.svg?react';
@@ -50,6 +60,8 @@ const messages = defineMessages({
   firehose: { id: 'column.firehose', defaultMessage: 'Live feeds' },
   direct: { id: 'navigation_bar.direct', defaultMessage: 'Private mentions' },
   favourites: { id: 'navigation_bar.favourites', defaultMessage: 'Favorites' },
+  jobs: { id: 'navigation_bar.jobs', defaultMessage: 'Jobs' },
+  organizations: { id: 'navigation_bar.organizations', defaultMessage: 'Organizations'},
   bookmarks: { id: 'navigation_bar.bookmarks', defaultMessage: 'Bookmarks' },
   lists: { id: 'navigation_bar.lists', defaultMessage: 'Lists' },
   preferences: { id: 'navigation_bar.preferences', defaultMessage: 'Preferences' },
@@ -61,6 +73,9 @@ const messages = defineMessages({
   advancedInterface: { id: 'navigation_bar.advanced_interface', defaultMessage: 'Open in advanced web interface' },
   openedInClassicInterface: { id: 'navigation_bar.opened_in_classic_interface', defaultMessage: 'Posts, accounts, and other specific pages are opened by default in the classic web interface.' },
   followRequests: { id: 'navigation_bar.follow_requests', defaultMessage: 'Follow requests' },
+  created_jobs: { id: 'navigation_bar.created_jobs', defaultMessage: 'Created jobs' },
+  saved_jobs: { id: 'navigation_bar.saved_jobs', defaultMessage: 'Saved jobs'},
+  applied_jobs: { id: 'navigation_bar.applied_jobs', defaultMessage: 'Applied jobs' },
 });
 
 const NotificationsLink = () => {
@@ -116,7 +131,7 @@ class NavigationPanel extends Component {
 
   render () {
     const { intl } = this.props;
-    const { signedIn, disabledAccountId, permissions } = this.props.identity;
+    const { signedIn, disabledAccountId, permissions, user_type, organization_id } = this.props.identity;
 
     let banner = undefined;
 
@@ -175,11 +190,16 @@ class NavigationPanel extends Component {
               <ColumnLink transparent to='/conversations' icon='at' iconComponent={AlternateEmailIcon} text={intl.formatMessage(messages.direct)} />
               <ColumnLink transparent to='/bookmarks' icon='bookmarks' iconComponent={BookmarksIcon} activeIconComponent={BookmarksActiveIcon} text={intl.formatMessage(messages.bookmarks)} />
               <ColumnLink transparent to='/favourites' icon='star' iconComponent={StarIcon} activeIconComponent={StarActiveIcon} text={intl.formatMessage(messages.favourites)} />
+              <ColumnLink transparent to='/jobs' icon='job' iconComponent={JobsIcon} activeIconComponent={JobsActiveIcon} text={intl.formatMessage(messages.jobs)} />
               <ColumnLink transparent to='/lists' icon='list-ul' iconComponent={ListAltIcon} activeIconComponent={ListAltActiveIcon} text={intl.formatMessage(messages.lists)} />
-
+              {user_type === 'organization' && <ColumnLink transparent to={organization_id === null ? '/organization/create' : ('/organization/' + organization_id)} icon='building' iconComponent={OrganizationsIcon} activeIconComponent={OrganizationsActiveIcon} text={intl.formatMessage(messages.organizations)} />}
+              {user_type === 'organization' && <ColumnLink transparent to='/jobs/created' icon='created' iconComponent={CreatedJobIcon} activeIconComponent={CreatedJobsActiveIcon} text={intl.formatMessage(messages.created_jobs)} />}
+              {user_type === 'student' && <ColumnLink transparent to='/jobs/saved' icon='saved' iconComponent={SavedJobIcon} activeIconComponent={SavedJobsActiveIcon} text={intl.formatMessage(messages.saved_jobs)} />}
+              {user_type === 'student' && <ColumnLink transparent to='/jobs/applied' icon='applied' iconComponent={AppliedJobIcon} activeIconComponent={AppliedJobsActiveIcon} text={intl.formatMessage(messages.applied_jobs)} />}
               <ListPanel />
 
               <hr />
+
 
               <ColumnLink transparent href='/settings/preferences' icon='cog' iconComponent={SettingsIcon} text={intl.formatMessage(messages.preferences)} />
 

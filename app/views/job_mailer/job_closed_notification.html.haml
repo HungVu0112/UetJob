@@ -1,0 +1,31 @@
+%h1= t('job_mailers.job_closed.heading')
+
+%p= t('job_mailers.job_closed.greeting', recipient: @user.display_name)
+
+%p= t('job_mailers.job_closed.intro', job_title: @job.title, company: @organization.name)
+
+.div{style: 'margin: 20px 0; padding: 15px; border-left: 4px solid #ccc; background-color: #f9f9f9;'}
+  %h3= t('job_mailers.job_closed.application_details')
+  %p
+    %strong= t('job_mailers.job_closed.job_title') + ':'
+    = @job.title
+  %p
+    %strong= t('job_mailers.job_closed.company') + ':'
+    = @organization.name
+  %p
+    %strong= t('job_mailers.job_closed.applied_on') + ':'
+    = l(@application.created_at, format: :long)
+  %p
+    %strong= t('job_mailers.job_closed.status') + ':'
+    = t("job_applications.statuses.#{@application.status}")
+
+%p= t('job_mailers.job_closed.what_next')
+
+%ul
+  - if @application.pending? || @application.reviewing? || @application.interviewed?
+    %li= t('job_mailers.job_closed.still_considering')
+  - elsif @application.accepted?
+    %li= t('job_mailers.job_closed.already_accepted')
+  - elsif @application.rejected?
+    %li= t('job_mailers.job_closed.already_rejected')
+  %li= t('job_mailers.job_closed.other_opportunities')

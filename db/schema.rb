@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_05_074104) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_28_050851) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -566,6 +566,51 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_05_074104) do
     t.index ["ip"], name: "index_ip_blocks_on_ip", unique: true
   end
 
+  create_table "job_applications", force: :cascade do |t|
+    t.string "status", default: "pending", null: false
+    t.text "cover_letter"
+    t.string "applicant_email", null: false
+    t.string "applicant_phone_number", null: false
+    t.string "applicant_fullname", null: false
+    t.string "resume_file_name", null: false
+    t.string "resume_content_type", null: false
+    t.bigint "resume_file_size", null: false
+    t.datetime "resume_updated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "job_id", null: false
+    t.index ["created_at"], name: "index_job_applications_on_created_at"
+    t.index ["job_id"], name: "index_job_applications_on_job_id"
+    t.index ["status"], name: "index_job_applications_on_status"
+    t.index ["user_id", "job_id"], name: "index_job_applications_on_user_id_and_job_id", unique: true
+    t.index ["user_id"], name: "index_job_applications_on_user_id"
+  end
+
+  create_table "jobs", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description", null: false
+    t.text "requirements"
+    t.string "location"
+    t.string "salary_range"
+    t.datetime "deadline"
+    t.string "status", default: "open", null: false
+    t.string "job_type", default: "full-time"
+    t.string "job_category"
+    t.string "contact_email"
+    t.integer "views_count", default: 0
+    t.integer "application_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "organization_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["created_at"], name: "index_jobs_on_created_at"
+    t.index ["job_type"], name: "index_jobs_on_job_type"
+    t.index ["organization_id"], name: "index_jobs_on_organization_id"
+    t.index ["status"], name: "index_jobs_on_status"
+    t.index ["user_id"], name: "index_jobs_on_user_id"
+  end
+
   create_table "list_accounts", force: :cascade do |t|
     t.bigint "list_id", null: false
     t.bigint "account_id", null: false
@@ -756,6 +801,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_05_074104) do
     t.index ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
     t.index ["superapp"], name: "index_oauth_applications_on_superapp", where: "(superapp = true)"
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
+  end
+
+  create_table "organizations", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "email_domain", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "avatar_file_name"
+    t.string "avatar_content_type"
+    t.integer "avatar_file_size"
+    t.datetime "avatar_updated_at"
+    t.index ["email_domain"], name: "index_organizations_on_email_domain", unique: true
   end
 
   create_table "pghero_space_stats", force: :cascade do |t|
@@ -1187,13 +1245,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_05_074104) do
     t.text "settings"
     t.string "time_zone"
     t.string "otp_secret"
+    t.string "user_type", default: "guest"
+    t.bigint "organization_id"
+    t.string "saved_jobs", default: [], array: true
     t.index ["account_id"], name: "index_users_on_account_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["created_by_application_id"], name: "index_users_on_created_by_application_id", where: "(created_by_application_id IS NOT NULL)"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["organization_id"], name: "index_users_on_organization_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, opclass: :text_pattern_ops, where: "(reset_password_token IS NOT NULL)"
     t.index ["role_id"], name: "index_users_on_role_id", where: "(role_id IS NOT NULL)"
     t.index ["unconfirmed_email"], name: "index_users_on_unconfirmed_email", where: "(unconfirmed_email IS NOT NULL)"
+    t.index ["user_type"], name: "index_users_on_user_type"
   end
 
   create_table "web_push_subscriptions", force: :cascade do |t|
@@ -1302,6 +1365,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_05_074104) do
   add_foreign_key "identities", "users", name: "fk_bea040f377", on_delete: :cascade
   add_foreign_key "imports", "accounts", name: "fk_6db1b6e408", on_delete: :cascade
   add_foreign_key "invites", "users", on_delete: :cascade
+  add_foreign_key "job_applications", "jobs"
+  add_foreign_key "job_applications", "users"
+  add_foreign_key "jobs", "organizations"
+  add_foreign_key "jobs", "users"
   add_foreign_key "list_accounts", "accounts", on_delete: :cascade
   add_foreign_key "list_accounts", "follow_requests", on_delete: :cascade
   add_foreign_key "list_accounts", "follows", on_delete: :cascade
@@ -1369,6 +1436,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_05_074104) do
   add_foreign_key "users", "accounts", name: "fk_50500f500d", on_delete: :cascade
   add_foreign_key "users", "invites", on_delete: :nullify
   add_foreign_key "users", "oauth_applications", column: "created_by_application_id", on_delete: :nullify
+  add_foreign_key "users", "organizations"
   add_foreign_key "users", "user_roles", column: "role_id", on_delete: :nullify
   add_foreign_key "web_push_subscriptions", "oauth_access_tokens", column: "access_token_id", on_delete: :cascade
   add_foreign_key "web_push_subscriptions", "users", on_delete: :cascade

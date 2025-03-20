@@ -1,0 +1,93 @@
+!!!
+%html{lang: "#{I18n.locale}"}
+  %head
+    %meta{:content => 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type'}
+    %meta{name: 'viewport', content: 'width=device-width, initial-scale=1.0'}
+    %title= message.subject
+    :css
+      body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+      }
+
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .logo {
+        max-width: 180px;
+        height: auto;
+      }
+
+      .content {
+        padding: 20px 0;
+      }
+
+      .footer {
+        padding: 20px 0;
+        text-align: center;
+        font-size: 13px;
+        color: #777;
+        border-top: 1px solid #eee;
+      }
+
+      h1, h2, h3 {
+        color: #2b90d9;
+      }
+
+      a {
+        color: #2b90d9;
+        text-decoration: none;
+      }
+
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #2b90d9;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+
+      .info-box {
+        margin: 20px 0;
+        padding: 15px;
+        border-left: 4px solid #2b90d9;
+        background-color: #f9f9f9;
+      }
+
+      .text-box {
+        white-space: pre-wrap;
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+  %body
+    .container
+      
+      .content
+        = yield
+
+      .footer
+        %p
+          = t('job_mailers.footer.text', instance: @instance)
+          %br
+          - if content_for?(:notification_preferences)
+            = yield :notification_preferences
